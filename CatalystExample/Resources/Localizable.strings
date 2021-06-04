@@ -21,3 +21,7 @@
 "TOOLBAR_SEARCH_PLACEHOLDER" = "Search Items";
 
 "CONTEXT_DELETE" = "Delete Item";
+
+"MENU_ITEM" = "Item";
+"MENU_ITEM_NEW_ITEM" = "New Item";
+
