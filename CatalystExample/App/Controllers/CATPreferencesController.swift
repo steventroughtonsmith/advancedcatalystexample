@@ -9,7 +9,7 @@ import Foundation
 class CATPreferencesController {
 	static let shared = CATPreferencesController()
 
-	static let debugEnabledKey = "ISSDebugEnabled"
+	static let debugEnabledKey = "CATDebugEnabled"
 
 	var enableDebugFeatures:Bool = UserDefaults.standard.bool(forKey: debugEnabledKey)
 }

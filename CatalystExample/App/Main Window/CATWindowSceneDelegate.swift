@@ -8,9 +8,9 @@ import UIKit
 import UniformTypeIdentifiers
 
 class CATWindowSceneDelegate : NSObject, UISceneDelegate, UIWindowSceneDelegate, UIDocumentPickerDelegate {
+	
 	var window: UIWindow?
 	weak var scene:UIScene?
-	var backgroundTaskID:UIBackgroundTaskIdentifier = .invalid
 		
 	func scene(_ scene: UIScene, willConnectTo session: UISceneSession, options connectionOptions: UIScene.ConnectionOptions) {
 		window = UIWindow(windowScene: scene as! UIWindowScene)
@@ -49,7 +49,7 @@ class CATWindowSceneDelegate : NSObject, UISceneDelegate, UIWindowSceneDelegate,
 		}
 	}
 
-	// MARK: -
+	// MARK: - Mac Toolbar
 	
 	func reloadToolbar() {
 		#if targetEnvironment(macCatalyst)
