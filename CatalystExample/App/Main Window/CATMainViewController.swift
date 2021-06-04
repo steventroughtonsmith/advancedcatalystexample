@@ -25,7 +25,8 @@ class CATMainViewController: UIViewController, ObservableObject, UISplitViewCont
 		rootSplitViewController.primaryBackgroundStyle = .sidebar
 		
 		rootSplitViewController.preferredPrimaryColumnWidth = UIFloat(260)
-				
+		rootSplitViewController.minimumPrimaryColumnWidth = UIFloat(200)
+
 		rootSplitViewController.delegate = self
 		rootSplitViewController.preferredDisplayMode = .twoBesideSecondary
 		rootSplitViewController.modalPresentationStyle = .overFullScreen
