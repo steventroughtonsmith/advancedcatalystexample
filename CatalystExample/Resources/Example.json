@@ -1,0 +1,38 @@
+{
+  "folders" : [
+	  {
+		  "title": "Folder A",
+		  "itemIDs" : [
+			  "2E6F2460-4B99-4287-8B42-C99991023E21"
+		  ]
+	  },
+	  {
+		  "title": "Folder B",
+		  "itemIDs" : [
+			  "2E6F2460-4B99-4287-8B42-C99991023E22"
+		  ]
+	  }
+  ],
+  "items" : [
+    {
+      "number" : 1,
+      "closed" : false,
+      "title" : "First",
+      "created" : 544025779.74363601,
+      "identifier" : "2E6F2460-4B99-4287-8B42-C99991023E21",
+      "modified" : 644463201.65309298,
+      "body" : "Lorem ipsum dolor sit amet",
+      "due" : 644025779.74363601
+    },
+	{
+	  "number" : 2,
+	  "closed" : false,
+	  "title" : "Second",
+	  "created" : 644025779.74363601,
+	  "identifier" : "2E6F2460-4B99-4287-8B42-C99991023E22",
+	  "modified" : 644463201.65309298,
+	  "body" : "Lorem ipsum dolor sit amet",
+	  "due" : 644025779.74363601
+	}
+  ]
+}

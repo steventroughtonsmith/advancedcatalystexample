@@ -1,0 +1,23 @@
+/*
+	2021 Steven Troughton-Smith (@stroughtonsmith)
+	Provided as sample code to do with as you wish.
+	No license or attribution required.
+*/
+
+"SIDEBAR_TITLE_LIBRARY" = "Library";
+"SIDEBAR_ALL_ITEMS" = "All Items";
+"SIDEBAR_RECENTS" = "Recent Items";
+
+"SIDEBAR_TITLE_FOLDERS" = "Folders";
+
+"ITEM_NONE_SELECTED_NEW_BUTTON" = "New Item";
+"ITEM_TITLE_UNTITLED" = "New Item";
+
+"SOURCE_VIEW_TITLE" = "Example";
+
+"MAIN_VIEW_HELLO_WORLD_LABEL" = "Hello World!";
+"MAIN_VIEW_DO_THING_BUTTON" = "Do thing";
+
+"TOOLBAR_SEARCH_PLACEHOLDER" = "Search Items";
+
+"CONTEXT_DELETE" = "Delete Item";
