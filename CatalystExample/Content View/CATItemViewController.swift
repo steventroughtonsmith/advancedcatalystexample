@@ -14,9 +14,7 @@ struct ContentView: View {
 	
 	var body: some View {
 		Text("MAIN_VIEW_HELLO_WORLD_LABEL")
-		Button("MAIN_VIEW_DO_THING_BUTTON") {
-			parent.doThing()
-		}
+	
 	}
 }
 
@@ -39,6 +37,10 @@ class CATItemViewController : UIViewController, ObservableObject {
 		if let hostingController = hostingController {
 			view.addSubview(hostingController.view)
 		}
+		
+		if #available(macCatalyst 15.0, iOS 15.0, *) {
+			focusGroupIdentifier = "com.example.details"
+		}
 	}
 
 	// MARK: -
@@ -53,7 +55,9 @@ class CATItemViewController : UIViewController, ObservableObject {
 		}
 	}
 	
-	func doThing() {
-
+	// MARK: - Keyboard Focus
+	
+	override func shouldUpdateFocus(in context: UIFocusUpdateContext) -> Bool {
+		return false
 	}
 }

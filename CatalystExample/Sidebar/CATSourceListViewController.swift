@@ -9,6 +9,7 @@ import UIKit
 class CATSourceListViewController: UICollectionViewController {
 	
 	var listViewController:CATItemListViewController?
+	var documentViewController:CATMainViewController?
 	
 	static let cellIdentifier = "Cell"
 	var diffableDataSource:UICollectionViewDiffableDataSource<AnyHashable,AnyHashable>?
@@ -212,6 +213,12 @@ class CATSourceListViewController: UICollectionViewController {
 				listViewController.currentFolderIndex = (indexPath.item - 1)
 			}
 		}
+		
+		guard let listViewController = documentViewController?.listViewController else { return }
+
+		if UIDevice.current.userInterfaceIdiom == .phone || view.window?.traitCollection.horizontalSizeClass == .compact {
+			navigationController?.pushViewController(listViewController, animated: true)
+		}
 	}
 	
 	override func collectionView(_ collectionView: UICollectionView, shouldHighlightItemAt indexPath: IndexPath) -> Bool {
@@ -219,7 +226,6 @@ class CATSourceListViewController: UICollectionViewController {
 			return false
 		}
 		else {
-			collectionView.selectItem(at: indexPath, animated: false, scrollPosition: [])
 			
 			return true
 		}

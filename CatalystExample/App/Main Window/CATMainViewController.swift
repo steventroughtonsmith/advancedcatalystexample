@@ -1,8 +1,8 @@
 /*
-	2021 Steven Troughton-Smith (@stroughtonsmith)
-	Provided as sample code to do with as you wish.
-	No license or attribution required.
-*/
+ 2021 Steven Troughton-Smith (@stroughtonsmith)
+ Provided as sample code to do with as you wish.
+ No license or attribution required.
+ */
 
 import UIKit
 
@@ -15,7 +15,7 @@ class CATMainViewController: UIViewController, ObservableObject, UISplitViewCont
 	public let sourceListViewController = CATSourceListViewController()
 	
 	let source = CATSourceFile(url: Bundle.main.url(forResource: "Example", withExtension: "json")!)
-
+	
 	init() {
 		
 		super.init(nibName: nil, bundle: nil)
@@ -26,20 +26,23 @@ class CATMainViewController: UIViewController, ObservableObject, UISplitViewCont
 		
 		rootSplitViewController.preferredPrimaryColumnWidth = UIFloat(260)
 		rootSplitViewController.minimumPrimaryColumnWidth = UIFloat(200)
-
+		
 		rootSplitViewController.delegate = self
 		rootSplitViewController.preferredDisplayMode = .twoBesideSecondary
 		rootSplitViewController.modalPresentationStyle = .overFullScreen
 		
-		#if targetEnvironment(macCatalyst)
+#if targetEnvironment(macCatalyst)
 		rootSplitViewController.presentsWithGesture = false
-		#endif
+#endif
 		
 		buildThreeColumnUI()
 		
 		addChild(rootSplitViewController)
 		view.addSubview(rootSplitViewController.view)
 		
+		
+		listViewController?.documentViewController = self
+		sourceListViewController.documentViewController = self
 		
 		listViewController?.source = source
 		detailViewController.source = source
@@ -53,28 +56,28 @@ class CATMainViewController: UIViewController, ObservableObject, UISplitViewCont
 	func buildThreeColumnUI() {
 		let sidebarNC = UINavigationController(rootViewController: sourceListViewController)
 		
-		#if targetEnvironment(macCatalyst)
+#if targetEnvironment(macCatalyst)
 		sidebarNC.isNavigationBarHidden = true
-		#else
+#else
 		sidebarNC.navigationBar.prefersLargeTitles = true
-		#endif
+#endif
 		
 		let listNC = UINavigationController(rootViewController: listViewController!)
-		#if targetEnvironment(macCatalyst)
+#if targetEnvironment(macCatalyst)
 		listNC.isNavigationBarHidden = true
 		listNC.navigationBar.setBackgroundImage(UIImage(), for: .default)
 		listNC.navigationBar.shadowImage = UIImage()
-		#else
+#else
 		listNC.navigationBar.prefersLargeTitles = true
-		#endif
+#endif
 		
 		let detailViewNC = UINavigationController(rootViewController: detailViewController)
-		#if targetEnvironment(macCatalyst)
+#if targetEnvironment(macCatalyst)
 		detailViewNC.isNavigationBarHidden = true
-		#else
+#else
 		detailViewNC.navigationBar.setBackgroundImage(UIImage(), for: .default)
 		detailViewNC.navigationBar.shadowImage = UIImage()
-		#endif
+#endif
 		detailViewNC.isToolbarHidden = true
 		
 		rootSplitViewController.viewControllers = [sidebarNC, listNC, detailViewNC]
@@ -85,10 +88,14 @@ class CATMainViewController: UIViewController, ObservableObject, UISplitViewCont
 	}
 	
 	// MARK: - Actions
-
+	
 	@objc func newItem(_ sender:Any) {
 		let item = CATItem()
 		source.add(item: item)
+	}
+	
+	@objc func newFolder(_ sender:Any) {		
+		source.newFolder()
 	}
 	
 	// MARK: - Layout
@@ -101,5 +108,15 @@ class CATMainViewController: UIViewController, ObservableObject, UISplitViewCont
 	
 	override var supportedInterfaceOrientations: UIInterfaceOrientationMask {
 		return UIDevice.current.userInterfaceIdiom == .phone ? .portrait : .all
+	}
+	
+	// MARK: - Size Class Transition
+	
+	override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
+		super.traitCollectionDidChange(previousTraitCollection)
+		
+		if traitCollection.horizontalSizeClass == .regular {
+			buildThreeColumnUI()
+		}
 	}
 }

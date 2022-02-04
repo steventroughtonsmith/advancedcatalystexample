@@ -52,7 +52,7 @@
       </BuildableProductRunnable>
       <CommandLineArguments>
          <CommandLineArgument
-            argument = "-ISSDebugEnabled YES"
+            argument = "-UIFocusLoopDebuggerEnabled YES"
             isEnabled = "NO">
          </CommandLineArgument>
       </CommandLineArguments>

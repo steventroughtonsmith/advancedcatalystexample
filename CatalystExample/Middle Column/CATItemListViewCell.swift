@@ -1,12 +1,12 @@
 /*
-	2021 Steven Troughton-Smith (@stroughtonsmith)
-	Provided as sample code to do with as you wish.
-	No license or attribution required.
-*/
+ 2021 Steven Troughton-Smith (@stroughtonsmith)
+ Provided as sample code to do with as you wish.
+ No license or attribution required.
+ */
 
 import UIKit
 
-class CATItemListViewCell: UICollectionViewListCell {
+class CATItemListViewCell: UICollectionViewCell {
 	
 	var inactive = false
 	
@@ -17,61 +17,77 @@ class CATItemListViewCell: UICollectionViewListCell {
 	
 	var stateAreaWidth = CGFloat.zero
 	
+	let focusRingView = UIView()
+	let selectionRingView = UIView()
+
 	override var isSelected: Bool {
 		didSet {
+			if isSelected == true {
+				selectionRingView.alpha = 1
+			}
+			else {
+				selectionRingView.alpha = 0
+			}
+
 			recolor()
 		}
 	}
-	
+
 	override var isHighlighted: Bool {
 		didSet {
 			recolor()
 		}
 	}
 	
-	var closed: Bool = false {
+	var showFocusRing: Bool = false {
 		didSet {
+			focusRingView.isHidden = !showFocusRing
+
 			recolor()
 		}
 	}
+
+	// MARK: -
 	
-	@objc func _focusRingType() -> UInt
-	{
-		return 1;
-	}
 	
 	override func prepareForReuse() {
 		isSelected = false
 		isHighlighted = false
-		
+		showFocusRing = false
 	}
 	
 	func recolor() {
 		
-		if (isSelected || isHighlighted) && !inactive {
+		var showWhiteLabels = false
+		
+		if (isSelected && !inactive) || showFocusRing {
+			showWhiteLabels = true
+		}
+		
+		if (!showFocusRing && isSelected) || isHighlighted {
+			showWhiteLabels = false
+		}
+		
+		if showWhiteLabels == true {
 			titleLabel.textColor = .white
 			bodyLabel.textColor = .white
 			modifiedLabel.textColor = .white
 		}
 		else {
-			titleLabel.textColor = closed ? .secondaryLabel : .label
+			titleLabel.textColor = .label
 			bodyLabel.textColor = .secondaryLabel
 			modifiedLabel.textColor = .secondaryLabel
-		}
-		if inactive {
-			selectedBackgroundView?.backgroundColor = .systemFill
-		}
-		else {
-			selectedBackgroundView?.backgroundColor = tintColor
 		}
 	}
 	
 	override init(frame: CGRect) {
 		super.init(frame: frame)
 		
-		selectedBackgroundView = UIView()
-		selectedBackgroundView?.layer.cornerRadius = UIFloat(8)
-		selectedBackgroundView?.backgroundColor = tintColor
+		focusRingView.layer.cornerRadius = UIFloat(8)
+		focusRingView.layer.cornerCurve = .continuous
+		
+		selectionRingView.layer.cornerRadius = UIFloat(8)
+		selectionRingView.layer.cornerCurve = .continuous
 		
 		titleLabel.font = UIFont.boldSystemFont(ofSize: UIFloat(18))
 		bodyLabel.font = UIFont.systemFont(ofSize: UIFloat(16))
@@ -84,9 +100,21 @@ class CATItemListViewCell: UICollectionViewListCell {
 		
 		recolor()
 		
+		selectionRingView.alpha = 0
+		selectionRingView.backgroundColor = .systemFill
+		addSubview(selectionRingView)
+		
+		focusRingView.isHidden = true
+		focusRingView.backgroundColor = tintColor
+		addSubview(focusRingView)
+		
 		contentView.addSubview(titleLabel)
 		contentView.addSubview(bodyLabel)
 		contentView.addSubview(modifiedLabel)
+
+		if #available(macCatalyst 15.0, iOS 15.0, *) {
+			focusEffect = nil
+		}
 	}
 	
 	required init?(coder: NSCoder) {
@@ -96,14 +124,14 @@ class CATItemListViewCell: UICollectionViewListCell {
 	// MARK: -
 	
 	override func layoutSubviews() {
-		
-		super.layoutSubviews()
-		
+								
 		let padding = UIFloat(13)
 		let insetFrame =  bounds.insetBy(dx: padding, dy: 0)
 		
 		contentView.frame = insetFrame.insetBy(dx: padding, dy: 0)
-		selectedBackgroundView?.frame = insetFrame
+
+		selectionRingView.frame = bounds.insetBy(dx: padding, dy: 0)
+		focusRingView.frame = selectionRingView.frame
 		
 		/* */
 		
@@ -123,5 +151,19 @@ class CATItemListViewCell: UICollectionViewListCell {
 	override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
 		inactive = (traitCollection.activeAppearance == .inactive)
 		recolor()
+	}
+	
+	// MARK: - Keyboard Focus
+	
+	override func didUpdateFocus(in context: UIFocusUpdateContext, with coordinator: UIFocusAnimationCoordinator) {
+		
+		super.didUpdateFocus(in: context, with: coordinator)
+		
+		if context.nextFocusedItem === self {
+			showFocusRing = true
+		}
+		else if context.previouslyFocusedItem === self {
+			showFocusRing = false
+		}
 	}
 }

@@ -134,6 +134,12 @@ extension CATSourceFile {
 		changed()
 	}
 	
+	func newFolder() {
+		dataStore.folders.append(CATFolder())
+		
+		changed()
+	}
+	
 	// MARK: - Change Notifications
 	
 	func changed() {

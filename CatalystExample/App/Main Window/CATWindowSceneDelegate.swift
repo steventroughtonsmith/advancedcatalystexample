@@ -36,6 +36,12 @@ class CATWindowSceneDelegate : NSObject, UISceneDelegate, UIWindowSceneDelegate,
 			documentViewController.newItem(sender)
 		}
 	}
+	
+	@objc func createFolder(_ sender:Any) {
+		if let documentViewController = window?.rootViewController as? CATMainViewController {
+			documentViewController.newFolder(sender)
+		}
+	}
 
 	@objc func search(_ sender:Any) {
 		if let nsSender = sender as? NSObject {

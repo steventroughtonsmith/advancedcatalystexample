@@ -25,3 +25,5 @@
 "MENU_ITEM" = "Item";
 "MENU_ITEM_NEW_ITEM" = "New Item";
 
+"TOOLBAR_NEW_FOLDER_BUTTON" = "New Folder";
+"FOLDER_UNTITLED" = "New Folder";

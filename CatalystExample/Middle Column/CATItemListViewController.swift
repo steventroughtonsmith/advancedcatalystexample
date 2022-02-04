@@ -1,8 +1,8 @@
 /*
-	2021 Steven Troughton-Smith (@stroughtonsmith)
-	Provided as sample code to do with as you wish.
-	No license or attribution required.
-*/
+ 2021 Steven Troughton-Smith (@stroughtonsmith)
+ Provided as sample code to do with as you wish.
+ No license or attribution required.
+ */
 
 import UIKit
 
@@ -23,10 +23,10 @@ class CATItemListViewController: UICollectionViewController {
 			reload()
 		}
 	}
-
+	
 	var currentFolderIndex = CATSourceFile.CATFolderIndexAll {
 		didSet {
-	
+			
 			if currentFolderIndex == CATSourceFile.CATFolderIndexAll {
 				title = NSLocalizedString("SIDEBAR_ALL_ITEMS", comment: "")
 			}
@@ -74,17 +74,20 @@ class CATItemListViewController: UICollectionViewController {
 			return cell
 		})
 		
-		#if !targetEnvironment(macCatalyst)
+#if !targetEnvironment(macCatalyst)
 		collectionView.backgroundColor = .systemGroupedBackground
-		#endif
-		
+#endif
+	
 		collectionView.backgroundColor = .systemBackground
 		
-		collectionView.selectionFollowsFocus = true
 		collectionView.register(CATItemListViewCell.self, forCellWithReuseIdentifier: CATItemListViewController.cellIdentifier)
 		collectionView.dataSource = diffableDataSource
 		collectionView.delegate = self
-
+		
+		if #available(iOS 15.0, macOS 15.0, *) {
+			collectionView.allowsFocus = true
+		}
+		
 		collectionView.contentInset.top = UIFloat(13)
 		
 		NotificationCenter.default.addObserver(forName: .documentChanged, object: nil, queue: nil) { [weak self] _ in
@@ -111,6 +114,17 @@ class CATItemListViewController: UICollectionViewController {
 		
 		NotificationCenter.default.addObserver(self, selector: #selector(adjustForKeyboard), name: UIResponder.keyboardWillHideNotification, object: nil)
 		NotificationCenter.default.addObserver(self, selector: #selector(adjustForKeyboard), name: UIResponder.keyboardWillChangeFrameNotification, object: nil)
+		
+#if !targetEnvironment(macCatalyst)
+		let searchController = UISearchController()
+		
+		searchController.searchResultsUpdater = self
+		searchController.definesPresentationContext = true
+		searchController.delegate = self
+		searchController.obscuresBackgroundDuringPresentation = false
+		
+		navigationItem.searchController = searchController
+#endif
 	}
 	
 	required init?(coder: NSCoder) {
@@ -132,16 +146,6 @@ class CATItemListViewController: UICollectionViewController {
 		}
 		navigationItem.rightBarButtonItem = barItem
 		
-		#if !targetEnvironment(macCatalyst)
-		let searchController = UISearchController()
-		
-		searchController.searchResultsUpdater = self
-		searchController.definesPresentationContext = true
-		searchController.delegate = self
-		searchController.obscuresBackgroundDuringPresentation = false
-		
-		navigationItem.searchController = searchController
-		#endif
 		
 	}
 	
@@ -174,7 +178,9 @@ class CATItemListViewController: UICollectionViewController {
 			snapshot.appendItems(items)
 		}
 		
-		diffableDataSource?.apply(snapshot, animatingDifferences: false, completion: {[weak self] in
+		guard let diffableDataSource = diffableDataSource else { return }
+
+		diffableDataSource.apply(snapshot, animatingDifferences: false, completion: { [weak self] in
 			self!.selectItemWithIdentifier(self!.selectedIdentifier)
 		})
 	}
@@ -195,6 +201,9 @@ class CATItemListViewController: UICollectionViewController {
 		}
 		
 		if found == true {
+			guard intendedIndexPath.section < collectionView.numberOfSections else { return }
+			guard intendedIndexPath.item < collectionView.numberOfItems(inSection: intendedIndexPath.section) else { return }
+			
 			collectionView.selectItem(at: intendedIndexPath, animated: false, scrollPosition: [])
 		}
 	}
@@ -215,6 +224,9 @@ class CATItemListViewController: UICollectionViewController {
 		}
 		
 		if found == true {
+			guard intendedIndexPath.section < collectionView.numberOfSections else { return }
+			guard intendedIndexPath.item < collectionView.numberOfItems(inSection: intendedIndexPath.section) else { return }
+			
 			collectionView(collectionView, didSelectItemAt: intendedIndexPath)
 		}
 	}
@@ -227,23 +239,20 @@ class CATItemListViewController: UICollectionViewController {
 			if indexPath.item < sortedItems.count {
 				let item = sortedItems[indexPath.item]
 				selectedIdentifier = item.identifier
-				documentViewController?.detailViewController.source = source
+				
+				guard let detailViewController = documentViewController?.detailViewController else { return }
+				detailViewController.source = source
+
+				if UIDevice.current.userInterfaceIdiom == .phone || view.window?.traitCollection.horizontalSizeClass == .compact {
+					navigationController?.pushViewController(detailViewController, animated: true)
+				}
 			}
 		}
 	}
 	
-	override func collectionView(_ collectionView: UICollectionView, shouldSelectItemAt indexPath: IndexPath) -> Bool {
-		
-		return true
+	override func collectionView(_ collectionView: UICollectionView, willDisplay cell: UICollectionViewCell, forItemAt indexPath: IndexPath) {
+		cell.selectedBackgroundView = nil
 	}
-	
-	override func collectionView(_ collectionView: UICollectionView, shouldHighlightItemAt indexPath: IndexPath) -> Bool {
-		if let ip = collectionView.indexPathsForSelectedItems?.first {
-			collectionView.deselectItem(at: ip, animated: false)
-		}
-		return true
-	}
-	
 	
 	// MARK: - Contextual Menus
 	
@@ -261,30 +270,36 @@ class CATItemListViewController: UICollectionViewController {
 		
 		var deleteActionsCommand = Array<UIAction>()
 		
-			do {
-				let action = UIAction(title: NSLocalizedString("CONTEXT_DELETE", comment:""), image: UIImage(systemName: "trash.fill", withConfiguration: symcfg), identifier: nil) { (UIAction) in
-					
-					if let source = self.source {
-						if let sortedItems = self.source?.sortedItems(tagIndex: self.currentFolderIndex) {
+		do {
+			let action = UIAction(title: NSLocalizedString("CONTEXT_DELETE", comment:""), image: UIImage(systemName: "trash.fill", withConfiguration: symcfg), identifier: nil) { (UIAction) in
+				
+				if let source = self.source {
+					if let sortedItems = self.source?.sortedItems(tagIndex: self.currentFolderIndex) {
+						
+						if indexPath.item < sortedItems.count {
+							let item = sortedItems[(indexPath.item)]
+							let identifier = item.identifier
 							
-							if indexPath.item < sortedItems.count {
-								let item = sortedItems[(indexPath.item)]
-								let identifier = item.identifier
-								
-								source.removeItem(withIdentifier: identifier)
-							}
+							source.removeItem(withIdentifier: identifier)
 						}
 					}
-					
 				}
-				action.attributes = .destructive
-				deleteActionsCommand.append(action)
+				
 			}
+			action.attributes = .destructive
+			deleteActionsCommand.append(action)
+		}
 		
 		
 		let deleteMenu = UIMenu(title: "", image: nil, identifier: UIMenu.Identifier(rawValue: "SIDEBAR_DELETE"), options: .displayInline, children: deleteActionsCommand)
 		
 		return UIMenu(title: "", image: nil, identifier: nil, options: [], children: [deleteMenu])
+	}
+	
+	// MARK: - Keyboard Focus
+	
+	override func collectionView(_ collectionView: UICollectionView, selectionFollowsFocusForItemAt indexPath: IndexPath) -> Bool {
+		return UIDevice.current.userInterfaceIdiom == .mac || view.window?.traitCollection.horizontalSizeClass == .regular
 	}
 }
 
